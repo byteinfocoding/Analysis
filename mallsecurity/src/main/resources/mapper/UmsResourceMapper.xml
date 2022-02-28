@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.byteinfo.mallsecurity.dao.UmsResourceMapper">
+  <resultMap id="BaseResultMap" type="top.byteinfo.mallsecurity.entity.UmsResource">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="category_id" jdbcType="BIGINT" property="categoryId" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from ums_resource
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="top.byteinfo.mallsecurity.entity.UmsResource">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into ums_resource (create_time, `name`, url, 
+      description, category_id)
+    values (#{createTime,jdbcType=TIMESTAMP}, #{name,jdbcType=VARCHAR}, #{url,jdbcType=VARCHAR}, 
+      #{description,jdbcType=VARCHAR}, #{categoryId,jdbcType=BIGINT})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="top.byteinfo.mallsecurity.entity.UmsResource">
+    update ums_resource
+    set create_time = #{createTime,jdbcType=TIMESTAMP},
+      `name` = #{name,jdbcType=VARCHAR},
+      url = #{url,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      category_id = #{categoryId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select id, create_time, `name`, url, description, category_id
+    from ums_resource
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select id, create_time, `name`, url, description, category_id
+    from ums_resource
+  </select>
+
+  <select id="getResourceList" resultType="top.byteinfo.mallsecurity.entity.UmsResource">
+    SELECT
+      ur.id id,
+      ur.create_time createTime,
+      ur.`name` `name`,
+      ur.url url,
+      ur.description description,
+      ur.category_id categoryId
+    FROM
+      ums_admin_role_relation ar
+        LEFT JOIN ums_role r ON ar.role_id = r.id
+        LEFT JOIN ums_role_resource_relation rrr ON r.id = rrr.role_id
+        LEFT JOIN ums_resource ur ON ur.id = rrr.resource_id
+    WHERE
+      ar.admin_id = #{adminId}
+      AND ur.id IS NOT NULL
+    GROUP BY
+      ur.id
+  </select>
+</mapper>
